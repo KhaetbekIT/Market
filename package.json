@@ -3,6 +3,7 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
+  "homepage": "https://khaetbekit.github.io/Market/",
   "scripts": {
     "start": "vite",
     "dev": "concurrently \"vite\" \"npx json-server -w db/db.json -p=9000\"",
