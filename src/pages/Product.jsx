@@ -99,7 +99,7 @@ const Product = () => {
                             </div>
 
                             <div className="back">
-                                <Link to={"/"} className='back__link'>Назад</Link>
+                                <Link to={"/Market/"} className='back__link'>Назад</Link>
                             </div>
                         </div>
                     </div>
