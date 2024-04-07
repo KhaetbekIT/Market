@@ -1,71 +1,62 @@
 import React, { Fragment, useState, useEffect } from 'react'
-import Cart from "../components/Cart";
+import Cart from "../components/Cart"
 import axios from 'axios';
 
 const Pagination = ({ productsPerPage, totalProducts, paginate }) => {
-    let array = [];
+    const array = [];
 
-    for (let i = 1; i <= Math.ceil(totalProducts / productsPerPage); i++) {
-        array.push(i)
+    for (
+        let i = 1; i <= Math.ceil(totalProducts / productsPerPage); i++
+    ) {
+        array.push(i);
     }
 
-    const buttonItem = array.map(btn => (
-        <button className="pagination" onClick={() => paginate(btn)}>
+    return array.map(btn => {
+        return <button
+            className="pagination"
+            key={btn}
+            onClick={() => paginate(btn)}
+        >
             {btn}
         </button>
-    ))
-
-    return (
-        <Fragment>
-            {buttonItem}
-        </Fragment>
-    )
+    })
 }
 
 const Home = () => {
     const [Products, setProducts] = useState([]);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [ProductsPerPage] = useState(3);
-
-    const RequestGet = async (path) => {
-        path = "http://localhost:9000" + path
-        await axios.get(path).then(response => {
-            const data = response.data;
-            setProducts(() => data ? [...data] : [])
-        }).catch(error => {
-            console.error(error);
-        })
-    }
-
-    // Get Current Products
-
-    const indexOfLastProducts = currentPage * ProductsPerPage;
-    const indexOfFirstProducts = indexOfLastProducts - ProductsPerPage;
-    const currentProduct = Products
-        .slice(indexOfFirstProducts, indexOfLastProducts);
-
-    // Change page
-
-    const paginate = (pageNumber) => setCurrentPage(pageNumber)
 
     useEffect(() => {
         try {
-            RequestGet("/product")
+            axios.get(`http://localhost:9000/product`).then(res => {
+                const data = res.data;
+                setProducts(() => {
+                    return data && data.length ? [...data] : []
+                })
+            }).catch(error => console.error(error))
         } catch (error) {
-            alert(error?.message);
+            console.error(error.message);
+            setProducts([])
         }
-    }, [])
+    }, [Products.length]);
+
+    const [CurrentPage, setCurrentPage] = useState(1);
+    const [ProductsPerPage] = useState(3);
+
+    const indexOfLastProduct = CurrentPage * ProductsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - ProductsPerPage;
+    const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
     const product = Products
-        .slice(indexOfFirstProducts, indexOfLastProducts)
-        .map(product => {
-            return <Cart
-                key={product.id}
-                id={product.id}
-                price={product.price}
-                title={product.title}
-                image={product.image}
-            />
+        .slice(indexOfFirstProduct, indexOfLastProduct).map(item => {
+            return <Fragment key={item.id}>
+                <Cart
+                    id={item.id}
+                    price={item.price}
+                    title={item.title}
+                    image={item.image}
+                />
+
+            </Fragment>
         });
 
     return (
@@ -80,9 +71,9 @@ const Home = () => {
 
                     <div className="main__paginations">
                         <Pagination
-                            paginate={paginate}
-                            totalProducts={Products.length}
                             productsPerPage={ProductsPerPage}
+                            totalProducts={Products.length}
+                            paginate={paginate}
                         />
                     </div>
                 </div>

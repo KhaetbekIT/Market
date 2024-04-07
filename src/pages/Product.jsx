@@ -1,122 +1,119 @@
 import React, { Fragment, useState, useEffect } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, Navigate, useParams } from 'react-router-dom'
 import Cart from "../components/Cart"
-import axios from 'axios'
+import axios from 'axios';
+import { useCart } from 'react-use-cart';
 
 const Product = () => {
-
-    const [GetProduct, setGetProduct] = useState({})
-    const [DataProducts, setDataProducts] = useState([])
     const { id } = useParams();
-
-    const RequestGet = async (path) => {
-        path = `http://localhost:9000` + path;
-        await axios.get(path).then(response => {
-            const data = response.data;
-
-            setGetProduct(() => data ? data : {})
-        }).catch(error => {
-            console.error(error);
-        });
-
-        await axios
-            .get(`http://localhost:9000/product`)
-            .then(response => {
-                const data = response.data;
-
-                setDataProducts(
-                    () => data && data.length ? data : []
-                )
-            })
-    }
-
-    const handleBuy = () => {
-        window.alert("Добавлено в корзину");
-
-        console.log(GetProduct);
-    }
+    const [Product, setProduct] = useState({});
+    const [ShortData, setShortData] = useState([]);
+    const { addItem } = useCart();
 
     useEffect(() => {
         try {
-            RequestGet(`/product/${id}`)
+            axios.get(`http://localhost:9000/product/${id}`)
+                .then(response => {
+                    const data = response.data;
+                    setProduct(data);
+                })
+            axios.get(`http://localhost:9000/product`)
+                .then(response => {
+                    setShortData([...response.data]);
+                })
         } catch (error) {
-            alert(error?.message)
+            console.error(error?.message);
         }
-    }, [GetProduct.id, id, DataProducts.length])
+    }, [id, Product?.id, ShortData.length]);
 
-    const seealsoItem = DataProducts
-    .filter(product => Number(product.id) !== Number(id))
-    .sort((a, b) => b.id - a.id )
-    .slice(0, 3)
-    .map(product => {
-        return <Fragment key={product.id}>
-            <Cart
-                price={product.price}
-                id={product.id}
-                image={product.image}
-                title={product.title}
-            />
-        </Fragment>
+    const handleClick = () => {
+        alert(`Товар: ${Product?.title} добавлено в карзину`)
+        // console.log(Product);
+
+        addItem({ ...Product, quantity: 1 });
+
+        setTimeout(() => {
+            window.location.replace("/bag");
+        }, 500)
+    }
+
+    const description = Product?.description?.map((text, id) => {
+        return (
+            <p key={id}>
+                {text}
+            </p>
+        )
     })
 
-    return (
-        <Fragment>
-            <section>
-                <div className="Container">
-                    <div className="main__row main__product-row">
-                        <div className="main__imageholder">
-                            <img src={GetProduct.image} alt="error" />
-                        </div>
+    const shortItem = ShortData
+        .filter(item => (
+            item.id != id || item.id != Product.id
+        ))
+        .slice(0, 3)
+        .map(product => {
+            return (
+                <Fragment key={product.id}>
+                    <Cart
+                        price={product.price}
+                        id={product.id}
+                        image={product.image}
+                        title={product.title}
+                    />
+                </Fragment>
+            )
+        })
 
-                        <div className="main__content">
-                            <h2 className="title-2 main__title">
-                                {GetProduct.title}
-                            </h2>
-
-                            <p className="price main__price">
-                                {GetProduct.price}
-                                <small className="currency-price"> руб.</small>
-                            </p>
-
-                            <div className="main__button">
-                                <button onClick={handleBuy} className='main__button-black'>
-                                    Купить в один клик
-                                </button>
+    if (id)
+        return (
+            <Fragment>
+                <section>
+                    <div className="Container">
+                        <div className="main__row main__product-row">
+                            <div className="main__imageholder">
+                                <img src={Product.image} alt="error" />
                             </div>
 
-                            <div className="main__description">
-                                <p>
-                                    Новый MacBook Air — ещё более тонкий и лёгкий, оснащён дисплеем Retina, клавиатурой нового поколения, трекпадом Force Touch и технологией Touch ID, которая защищает ваши данные и открывает доступ к ним только вам.
+                            <div className="main__content">
+                                <h2 className="title-2 main__title">
+                                    {Product.title}
+                                </h2>
+
+                                <p className="price main__price">
+                                    {Product.price}
+                                    <small className="currency-price"> руб.</small>
                                 </p>
 
-                                <p>
-                                    Это самый экологичный Mac. Для его корпуса используется только переработанный алюминий.1 И это невероятно удобный MacBook Air, который справится с любыми задачами.
-                                </p>
+                                <div className="main__button">
+                                    <button onClick={handleClick} className='main__button-black'>
+                                        Купить в один клик
+                                    </button>
+                                </div>
 
-                                <p>
-                                    Подробнее об особенностях и преимуществах MacBook Air.
-                                </p>
-                            </div>
+                                <div className="main__description">
+                                    {description}
+                                </div>
 
-                            <div className="back">
-                                <Link to={"/Market/"} className='back__link'>Назад</Link>
+                                <div className="back">
+                                    <Link to={"/"} className='back__link'>Назад</Link>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </section>
+                </section>
 
-            <section className="also">
-                <div className="Container">
-                    <h2 className="title-2">Смотрите также</h2>
+                <section className="also">
+                    <div className="Container">
+                        <h2 className="title-2">Смотрите также</h2>
 
-                    <div className="also__row">
-                        {seealsoItem}
+                        <div className="also__row">
+                            {shortItem}
+                        </div>
                     </div>
-                </div>
-            </section>
-        </Fragment>
-    )
+                </section>
+            </Fragment>
+        )
+
+    return (<h1>Is not defined</h1>)
 }
 
 export default Product
