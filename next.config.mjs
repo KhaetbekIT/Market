@@ -1,11 +1,55 @@
-/** @type {import('next').NextConfig} */
 const nextConfig = {
-  typescript: {
-    ignoreBuildErrors: true,
+  reactStrictMode: true,
+  logging: {
+    fetches: {
+      fullUrl: true,
+      hmrRefreshes: true,
+    },
   },
+  poweredByHeader: false,
+  typedRoutes: true,
+  output: "standalone",
+  transpilePackages: ["@t3-oss/env-nextjs", "@t3-oss/env-core"],
   images: {
-    unoptimized: true,
+    qualities: [75, 100],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "images.unsplash.com",
+        port: "",
+        pathname: "/**",
+      },
+    ],
   },
-}
+  reactCompiler: true,
+  experimental: {
+    cssChunking: true,
+    // A list of packages that Next.js should automatically evaluate and optimize the imports for.
+    // @see https://vercel.com/blog/how-we-optimized-package-imports-in-next-js
+    optimizePackageImports: ["tailwindcss", "tailwind-merge", "clsx"],
+  },
+  headers: async () => {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          {
+            key: "X-Developed-By",
+            value: "Khaetbek",
+          },
+        ],
+      },
+      {
+        source: "/:path*{/}?",
+        headers: [
+          {
+            key: "X-Accel-Buffering",
+            value: "no",
+          },
+        ],
+      },
+    ];
+  },
+};
 
-export default nextConfig
+export default nextConfig;
