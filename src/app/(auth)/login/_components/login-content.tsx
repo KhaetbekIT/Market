@@ -57,6 +57,7 @@ export const LoginContent = () => {
 							value={email}
 							onChange={(e) => setEmail(e.target.value)}
 							placeholder="email@example.com"
+							autoComplete="email"
 							required
 						/>
 					</div>
@@ -70,6 +71,7 @@ export const LoginContent = () => {
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
 								placeholder="Введите пароль"
+								autoComplete="current-password"
 								required
 							/>
 							<Button
@@ -106,9 +108,12 @@ export const LoginContent = () => {
 					</Button>
 				</form>
 
-				<p className="text-xs text-muted-foreground text-center mt-4 p-3 bg-muted rounded-lg">
-					Это демо-версия. Введите любой email и пароль для входа.
-				</p>
+				<div className="text-xs text-muted-foreground text-center mt-4 p-3 bg-muted rounded-lg">
+					<p>Демо-аккаунт</p>
+					<p className="font-medium text-foreground mt-1">
+						demo@market.ru · market2026
+					</p>
+				</div>
 
 				<p className="text-center text-sm text-muted-foreground mt-6">
 					Нет аккаунта?{" "}

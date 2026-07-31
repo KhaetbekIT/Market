@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type FormEvent } from "react";
+import { type FormEvent, useEffect, useState } from "react";
 import {
 	Breadcrumb,
 	BreadcrumbItem,
@@ -15,32 +15,48 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { ROUTERS } from "@/configs/router.config";
 import { useStore } from "@/contexts/store-context";
+import {
+	isInternationalPhone,
+	PHONE_PATTERN,
+} from "@/lib/form-validation.util";
 
 export const SettingsContent = () => {
 	const router = useRouter();
-	const { user } = useStore();
+	const { user, isInitialized, updateUser } = useStore();
 	const [name, setName] = useState("");
 	const [email, setEmail] = useState("");
 	const [phone, setPhone] = useState("");
 	const [saved, setSaved] = useState(false);
+	const [error, setError] = useState("");
 
 	useEffect(() => {
-		if (!user) {
+		if (isInitialized && !user) {
 			router.push(ROUTERS.LOGIN);
-		} else {
+		} else if (user) {
 			setName(user.name);
 			setEmail(user.email);
 			setPhone(user.phone || "");
 		}
-	}, [user, router]);
+	}, [user, isInitialized, router]);
 
-	if (!user) {
+	if (!isInitialized || !user) {
 		return null;
 	}
 
 	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
-		// In a real app, this would update the user
+		setError("");
+		if (phone.trim() && !isInternationalPhone(phone)) {
+			setError(
+				"Введите телефон в международном формате: от 7 до 15 цифр.",
+			);
+			return;
+		}
+		updateUser({
+			name: name.trim(),
+			email: email.trim(),
+			phone: phone.trim(),
+		});
 		setSaved(true);
 		setTimeout(() => setSaved(false), 3000);
 	};
@@ -78,6 +94,10 @@ export const SettingsContent = () => {
 								value={name}
 								onChange={(e) => setName(e.target.value)}
 								placeholder="Ваше имя"
+								minLength={2}
+								maxLength={100}
+								autoComplete="name"
+								required
 							/>
 						</div>
 
@@ -89,6 +109,8 @@ export const SettingsContent = () => {
 								value={email}
 								onChange={(e) => setEmail(e.target.value)}
 								placeholder="email@example.com"
+								autoComplete="email"
+								required
 							/>
 						</div>
 
@@ -99,9 +121,17 @@ export const SettingsContent = () => {
 								type="tel"
 								value={phone}
 								onChange={(e) => setPhone(e.target.value)}
-								placeholder="+7 (999) 123-45-67"
+								pattern={PHONE_PATTERN}
+								maxLength={25}
+								autoComplete="tel"
+								title="Используйте международный формат: +998 90 123 45 67"
+								placeholder="+998 90 123 45 67"
 							/>
 						</div>
+
+						{error && (
+							<p className="text-sm text-destructive">{error}</p>
+						)}
 
 						<div className="flex items-center gap-4 pt-4">
 							<Button type="submit">Сохранить</Button>

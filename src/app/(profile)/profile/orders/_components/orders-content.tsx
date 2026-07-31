@@ -26,15 +26,15 @@ import { cn, formatPrice } from "@/lib/utils";
 
 export const OrdersContent = () => {
 	const router = useRouter();
-	const { user, orders } = useStore();
+	const { user, isInitialized, orders } = useStore();
 
 	useEffect(() => {
-		if (!user) {
+		if (isInitialized && !user) {
 			router.push(ROUTERS.LOGIN);
 		}
-	}, [user, router]);
+	}, [user, isInitialized, router]);
 
-	if (!user) {
+	if (!isInitialized || !user) {
 		return null;
 	}
 

@@ -18,6 +18,11 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { ROUTERS } from "@/configs/router.config";
 import { useStore } from "@/contexts/store-context";
+import {
+	isInternationalPhone,
+	isPostalCode,
+	PHONE_PATTERN,
+} from "@/lib/form-validation.util";
 import { cn, formatPrice } from "@/lib/utils";
 import type { Address } from "@/types/address.type";
 
@@ -28,6 +33,7 @@ export const CheckoutContent = () => {
 	const [step, setStep] = useState<CheckoutStep>("shipping");
 	const [isLoading, setIsLoading] = useState(false);
 	const [orderId, setOrderId] = useState<string | null>(null);
+	const [shippingError, setShippingError] = useState("");
 
 	const [shippingData, setShippingData] = useState({
 		name: user?.name || "",
@@ -45,6 +51,17 @@ export const CheckoutContent = () => {
 
 	const handleShippingSubmit = (e: FormEvent) => {
 		e.preventDefault();
+		setShippingError("");
+		if (!isInternationalPhone(shippingData.phone)) {
+			setShippingError(
+				"Введите телефон в международном формате: от 7 до 15 цифр.",
+			);
+			return;
+		}
+		if (!isPostalCode(shippingData.postalCode)) {
+			setShippingError("Введите корректный почтовый индекс.");
+			return;
+		}
 		setStep("payment");
 	};
 
@@ -179,7 +196,10 @@ export const CheckoutContent = () => {
 											})
 										}
 										required
-										placeholder="Иван Иванов"
+										minLength={2}
+										maxLength={100}
+										autoComplete="name"
+										placeholder="Ваше полное имя"
 									/>
 								</div>
 								<div className="space-y-2">
@@ -195,7 +215,11 @@ export const CheckoutContent = () => {
 											})
 										}
 										required
-										placeholder="+7 (999) 123-45-67"
+										pattern={PHONE_PATTERN}
+										maxLength={25}
+										autoComplete="tel"
+										title="Используйте международный формат: +998 90 123 45 67"
+										placeholder="+998 90 123 45 67"
 									/>
 								</div>
 								<div className="space-y-2 sm:col-span-2">
@@ -211,6 +235,7 @@ export const CheckoutContent = () => {
 											})
 										}
 										required
+										autoComplete="email"
 										placeholder="email@example.com"
 									/>
 								</div>
@@ -226,7 +251,10 @@ export const CheckoutContent = () => {
 											})
 										}
 										required
-										placeholder="Москва"
+										minLength={2}
+										maxLength={100}
+										autoComplete="address-level2"
+										placeholder="Ваш город"
 									/>
 								</div>
 								<div className="space-y-2">
@@ -241,7 +269,10 @@ export const CheckoutContent = () => {
 											})
 										}
 										required
-										placeholder="123456"
+										minLength={2}
+										maxLength={16}
+										autoComplete="postal-code"
+										placeholder="Почтовый индекс"
 									/>
 								</div>
 								<div className="space-y-2 sm:col-span-2">
@@ -256,10 +287,19 @@ export const CheckoutContent = () => {
 											})
 										}
 										required
-										placeholder="ул. Примерная, д. 1, кв. 1"
+										minLength={3}
+										maxLength={200}
+										autoComplete="street-address"
+										placeholder="Улица, дом, квартира или офис"
 									/>
 								</div>
 							</div>
+
+							{shippingError && (
+								<p className="text-sm text-destructive mt-4">
+									{shippingError}
+								</p>
+							)}
 
 							<div className="flex justify-between mt-6">
 								<Button variant="ghost" asChild>

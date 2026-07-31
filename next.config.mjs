@@ -24,6 +24,7 @@ const nextConfig = {
   reactCompiler: true,
   experimental: {
     cssChunking: true,
+    useTypeScriptCli: true,
     // A list of packages that Next.js should automatically evaluate and optimize the imports for.
     // @see https://vercel.com/blog/how-we-optimized-package-imports-in-next-js
     optimizePackageImports: ["tailwindcss", "tailwind-merge", "clsx"],
