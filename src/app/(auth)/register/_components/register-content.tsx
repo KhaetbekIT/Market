@@ -44,7 +44,7 @@ export const RegisterContent = () => {
 			if (success) {
 				router.push(ROUTERS.PROFILE);
 			} else {
-				setError("Ошибка регистрации");
+				setError("Аккаунт с таким email уже существует");
 			}
 		} catch {
 			setError("Произошла ошибка. Попробуйте ещё раз.");
@@ -73,7 +73,10 @@ export const RegisterContent = () => {
 							type="text"
 							value={name}
 							onChange={(e) => setName(e.target.value)}
-							placeholder="Иван Иванов"
+							placeholder="Ваше полное имя"
+							minLength={2}
+							maxLength={100}
+							autoComplete="name"
 							required
 						/>
 					</div>
@@ -86,6 +89,7 @@ export const RegisterContent = () => {
 							value={email}
 							onChange={(e) => setEmail(e.target.value)}
 							placeholder="email@example.com"
+							autoComplete="email"
 							required
 						/>
 					</div>
@@ -100,6 +104,8 @@ export const RegisterContent = () => {
 								onChange={(e) => setPassword(e.target.value)}
 								placeholder="Минимум 6 символов"
 								minLength={6}
+								maxLength={128}
+								autoComplete="new-password"
 								required
 							/>
 							<Button
@@ -133,6 +139,9 @@ export const RegisterContent = () => {
 							value={confirmPassword}
 							onChange={(e) => setConfirmPassword(e.target.value)}
 							placeholder="Повторите пароль"
+							minLength={6}
+							maxLength={128}
+							autoComplete="new-password"
 							required
 						/>
 					</div>

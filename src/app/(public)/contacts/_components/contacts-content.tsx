@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
+import { PHONE_PATTERN } from "@/lib/form-validation.util";
 
 export const ContactsContent = () => {
 	const [submitted, setSubmitted] = useState(false);
@@ -112,7 +113,10 @@ export const ContactsContent = () => {
 											</Label>
 											<Input
 												id="name"
-												placeholder="Иван Иванов"
+												placeholder="Ваше полное имя"
+												minLength={2}
+												maxLength={100}
+												autoComplete="name"
 												required
 											/>
 										</div>
@@ -122,6 +126,7 @@ export const ContactsContent = () => {
 												id="email"
 												type="email"
 												placeholder="ivan@example.com"
+												autoComplete="email"
 												required
 											/>
 										</div>
@@ -132,7 +137,11 @@ export const ContactsContent = () => {
 										<Input
 											id="phone"
 											type="tel"
-											placeholder="+7 (999) 123-45-67"
+											pattern={PHONE_PATTERN}
+											maxLength={25}
+											autoComplete="tel"
+											title="Используйте международный формат: +998 90 123 45 67"
+											placeholder="+998 90 123 45 67"
 										/>
 									</div>
 

@@ -1,6 +1,14 @@
 "use client";
 
-import { Heart, LogOut, Package, Settings, User } from "lucide-react";
+import {
+	Heart,
+	LogOut,
+	MapPin,
+	Package,
+	Settings,
+	ShoppingBag,
+	User,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
@@ -18,15 +26,15 @@ import { useStore } from "@/contexts/store-context";
 
 export const ProfileContent = () => {
 	const router = useRouter();
-	const { user, logout, orders, favorites } = useStore();
+	const { user, isInitialized, logout, orders, favorites } = useStore();
 
 	useEffect(() => {
-		if (!user) {
+		if (isInitialized && !user) {
 			router.push(ROUTERS.LOGIN);
 		}
-	}, [user, router]);
+	}, [user, isInitialized, router]);
 
-	if (!user) {
+	if (!isInitialized || !user) {
 		return null;
 	}
 
@@ -93,6 +101,20 @@ export const ProfileContent = () => {
 								</p>
 							</div>
 						</div>
+						{user.phone && (
+							<p className="text-sm text-muted-foreground mb-2">
+								{user.phone}
+							</p>
+						)}
+						{user.addresses[0] && (
+							<div className="flex gap-2 text-sm text-muted-foreground mb-6">
+								<MapPin className="h-4 w-4 shrink-0 mt-0.5" />
+								<span>
+									{user.addresses[0].city},{" "}
+									{user.addresses[0].street}
+								</span>
+							</div>
+						)}
 
 						<Button
 							variant="outline"
@@ -107,6 +129,26 @@ export const ProfileContent = () => {
 
 				{/* Menu */}
 				<div className="md:col-span-2">
+					<div className="grid grid-cols-2 gap-4 mb-4">
+						<div className="bg-card rounded-lg border border-border p-5">
+							<ShoppingBag className="h-5 w-5 text-muted-foreground mb-3" />
+							<p className="text-2xl font-bold">
+								{orders.length}
+							</p>
+							<p className="text-sm text-muted-foreground">
+								Всего заказов
+							</p>
+						</div>
+						<div className="bg-card rounded-lg border border-border p-5">
+							<Heart className="h-5 w-5 text-muted-foreground mb-3" />
+							<p className="text-2xl font-bold">
+								{favorites.length}
+							</p>
+							<p className="text-sm text-muted-foreground">
+								В избранном
+							</p>
+						</div>
+					</div>
 					<div className="grid sm:grid-cols-2 gap-4">
 						{menuItems.map((item) => (
 							<Link

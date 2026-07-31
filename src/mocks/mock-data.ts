@@ -47,7 +47,16 @@ export const categories: Category[] = [
 	},
 ];
 
-const generateId = () => Math.random().toString(36).substring(2, 11);
+const hash = (value: string) =>
+	[...value].reduce(
+		(result, char) => (result * 31 + char.charCodeAt(0)) >>> 0,
+		7,
+	);
+
+const seededNumber = (seed: string, min: number, max: number) => {
+	const normalized = (Math.sin(hash(seed)) + 1) / 2;
+	return min + normalized * (max - min);
+};
 
 const productImages: Record<string, string[]> = {
 	smartphones: [
@@ -167,6 +176,7 @@ const productNames: Record<string, string[]> = {
 
 const generatePrice = (
 	category: string,
+	seed: string,
 ): { price: number; oldPrice?: number } => {
 	const basePrices: Record<string, [number, number]> = {
 		smartphones: [15000, 120000],
@@ -187,10 +197,12 @@ const generatePrice = (
 	};
 
 	const [min, max] = basePrices[category] || [1000, 10000];
-	const price = Math.round((Math.random() * (max - min) + min) / 100) * 100;
-	const hasDiscount = Math.random() > 0.6;
+	const price =
+		Math.round(seededNumber(`${seed}-price`, min, max) / 100) * 100;
+	const hasDiscount = hash(`${seed}-discount`) % 3 === 0;
 	const oldPrice = hasDiscount
-		? Math.round((price * (1 + Math.random() * 0.3)) / 100) * 100
+		? Math.round((price * seededNumber(`${seed}-old`, 1.12, 1.3)) / 100) *
+			100
 		: undefined;
 
 	return { price, oldPrice };
@@ -302,6 +314,69 @@ const additionalImages: Record<string, string[]> = {
 		"https://images.unsplash.com/photo-1461151304267-38535e780c79?w=600&h=600&fit=crop",
 		"https://images.unsplash.com/photo-1593784991095-a205069470b6?w=600&h=600&fit=crop",
 	],
+	"mens-clothing": [
+		"https://images.unsplash.com/photo-1617137968427-85924c800a22?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1610652492500-ded49ceeb378?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1598033129183-c4f50c736f10?w=700&h=700&fit=crop",
+	],
+	"womens-clothing": [
+		"https://images.unsplash.com/photo-1434389677669-e08b4cac3105?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1496747611176-843222e1e57c?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1483985988355-763728e1935b?w=700&h=700&fit=crop",
+	],
+	shoes: [
+		"https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1460353581641-37baddab0fa2?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1549298916-b41d501d3772?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1600185365483-26d7a4cc7519?w=700&h=700&fit=crop",
+	],
+	accessories: [
+		"https://images.unsplash.com/photo-1523170335258-f5ed11844a49?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1584917865442-de89df76afd3?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1523779917675-b6ed3a42a561?w=700&h=700&fit=crop",
+	],
+	furniture: [
+		"https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1549497538-303791108f95?w=700&h=700&fit=crop",
+	],
+	decor: [
+		"https://images.unsplash.com/photo-1513519245088-0e12902e35a6?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1494438639946-1ebd1d20bf85?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1618220179428-22790b461013?w=700&h=700&fit=crop",
+	],
+	textiles: [
+		"https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1604014237800-1c9102c219da?w=700&h=700&fit=crop",
+	],
+	lighting: [
+		"https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1540932239986-30128078f3c5?w=700&h=700&fit=crop",
+	],
+	skincare: [
+		"https://images.unsplash.com/photo-1556228720-195a672e8a03?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1556228578-8c89e6adf883?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1598440947619-2c35fc9aa908?w=700&h=700&fit=crop",
+	],
+	makeup: [
+		"https://images.unsplash.com/photo-1512496015851-a90fb38ba796?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1583241800698-e8ab01830a7c?w=700&h=700&fit=crop",
+	],
+	perfume: [
+		"https://images.unsplash.com/photo-1541643600914-78b084683601?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1594035910387-fea47794261f?w=700&h=700&fit=crop",
+		"https://images.unsplash.com/photo-1615634260167-c8cdede054de?w=700&h=700&fit=crop",
+	],
 };
 
 export function generateProducts(): Product[] {
@@ -316,20 +391,23 @@ export function generateProducts(): Product[] {
 				[];
 			const brands = brandNames[subcategory.slug] || ["Бренд"];
 
-			// Generate 6-10 products per subcategory for better coverage
-			const count = Math.floor(Math.random() * 5) + 6;
+			const count = 8;
 
 			for (let i = 0; i < count; i++) {
+				const seed = `${subcategory.slug}-${i + 1}`;
 				const name = names[i % names.length];
 				const brand = brands[i % brands.length] as string;
-				const { price, oldPrice } = generatePrice(subcategory.slug);
+				const { price, oldPrice } = generatePrice(
+					subcategory.slug,
+					seed,
+				);
 				const imageIndex = i % (images.length || 1);
 				const defaultImage =
 					productImages[subcategory.slug]?.[0] ||
 					"https://images.unsplash.com/photo-1560472354-b33ff0c44a43?w=600&h=600&fit=crop";
 
 				products.push({
-					id: generateId(),
+					id: seed,
 					name: `${brand} ${name}${i >= names.length ? ` ${Math.floor(i / names.length) + 1}` : ""}`.trim(),
 					description: `${brand} ${name} - высококачественный товар из категории "${subcategory.name}". Отличное соотношение цены и качества. Гарантия качества. Доставка по всей России.`,
 					price,
@@ -338,13 +416,24 @@ export function generateProducts(): Product[] {
 					subcategory: subcategory.slug,
 					images:
 						images.length > 0
-							? ([images[imageIndex]] as string[])
+							? [0, 1, 2].map(
+									(offset) =>
+										images[
+											(imageIndex + offset) %
+												images.length
+										] as string,
+								)
 							: [defaultImage],
-					rating: Math.round((3.5 + Math.random() * 1.5) * 10) / 10,
-					reviewCount: Math.floor(Math.random() * 500) + 10,
-					inStock: Math.random() > 0.12,
+					rating:
+						Math.round(
+							seededNumber(`${seed}-rating`, 3.8, 5) * 10,
+						) / 10,
+					reviewCount: Math.round(
+						seededNumber(`${seed}-reviews`, 12, 520),
+					),
+					inStock: hash(`${seed}-stock`) % 9 !== 0,
 					specifications: {
-						Артикул: generateId().toUpperCase(),
+						Артикул: `MKT-${subcategory.id.toUpperCase()}-${String(i + 1).padStart(3, "0")}`,
 						Бренд: brand,
 						Производитель: [
 							"Россия",
@@ -353,7 +442,15 @@ export function generateProducts(): Product[] {
 							"Италия",
 							"Япония",
 							"США",
-						][Math.floor(Math.random() * 6)] as string,
+						][hash(`${seed}-country`) % 6] as string,
+						Гарантия:
+							hash(`${seed}-warranty`) % 2
+								? "12 месяцев"
+								: "24 месяца",
+						Наличие:
+							hash(`${seed}-stock`) % 9 !== 0
+								? "На складе"
+								: "Под заказ",
 					},
 					tags: [subcategory.name, category.name, brand],
 				});
